@@ -2,6 +2,7 @@ package no.kristiania.db
 
 import no.kristiania.CardService
 import no.kristiania.FakeData
+import no.kristiania.model.Collection
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
