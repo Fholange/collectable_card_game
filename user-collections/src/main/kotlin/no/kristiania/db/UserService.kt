@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 import javax.persistence.LockModeType
 
 interface UserRepository : CrudRepository<User, String>{
@@ -43,9 +45,81 @@ fun findUserByIdEeager(userId: String) : User?{
         return true
     }
 
-    private fun validateCard(){
-    if(cardService.isInitialized()){
+    private fun validateCard(cardId : String){
+
+        if(!cardService.isInitialized()){
+        throw IllegalStateException("CardService Not Initialized")
+        }
+
+        if(!cardService.cardCollection.any {it.cardId == cardId}){
+            throw IllegalArgumentException("Invalid cardId $cardId")
+        }
 
     }
+
+    private fun validateUser(userId: String){
+        if(!userRepository.existsById(userId)){
+            throw IllegalArgumentException("User $userId does not exist")
+        }
+    }
+
+    private fun validate(userId: String, cardId: String){
+        validateCard(cardId)
+        validateUser(userId)
+    }
+
+    fun buyCard(userId: String, cardId: String){
+        validate(userId, cardId)
+
+        val price = cardService.price(cardId)
+        val user = userRepository.lockedFind(userId)!!
+
+        if(user.coins < price){
+            throw IllegalArgumentException("Not enough coins")
+        }
+
+        user.coins-= price;
+
+        addCard(user, cardId)
+
+    }
+
+    private fun addCard(user: User, cardId: String){
+        user.ownedCards.find{it.cardId == cardId}
+                ?.apply { numberOfCopies++ }
+                ?: CardCopy().apply {
+                    this.cardId = cardId
+                    this.user = user
+                    this.numberOfCopies = 1
+                }.also { user.ownedCards.add(it) }
+
+    }
+
+    fun millCard(userId: String, cardId: String){
+        validate(userId, cardId)
+
+        //gets user by userId
+        val user = userRepository.lockedFind(userId)!!
+
+        //Check if user owns card
+        val copy = user.ownedCards.find { it.cardId == cardId }
+        if(copy == null || copy.numberOfCopies == 0){
+            throw IllegalArgumentException("User $userId does not own $cardId")
+        }
+
+        copy.numberOfCopies--
+
+        val millValue = cardService.millValue(cardId)
+        user.coins += millValue
+    }
+
+    fun openPack(userId: String, cardId: String){
+        validate(userId, cardId)
+        val user = userRepository.lockedFind(userId)!!
+
+        if(user.cardPacks < 1){
+            throw IllegalArgumentException("no packs to open")
+        }
+            user.cardPacks--
     }
 }

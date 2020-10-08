@@ -1,6 +1,6 @@
 package no.kristiania.model
 
-import no.kristiania.dto.CardsDto
+import no.kristiania.dto.CardDto
 import no.kristiania.dto.Rarity
 
 
@@ -9,7 +9,7 @@ data class Card(
         val rarity: Rarity
 
 ) {
-    constructor(dto: CardsDto): this(
+    constructor(dto: CardDto): this(
             dto.cardId ?: throw IllegalArgumentException("Null cardId"),
              dto.rarity ?: throw IllegalArgumentException("Null rarity")
     )

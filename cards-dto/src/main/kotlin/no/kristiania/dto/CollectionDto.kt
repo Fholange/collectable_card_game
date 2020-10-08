@@ -1,7 +1,7 @@
 package no.kristiania.dto
 
 class CollectionDto (
-        var cards : MutableList<CardsDto> = mutableListOf(),
+        var cards : MutableList<CardDto> = mutableListOf(),
 
         var prices : MutableMap<Rarity, Int> = mutableMapOf(),
 

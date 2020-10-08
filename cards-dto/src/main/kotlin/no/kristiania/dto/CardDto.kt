@@ -1,6 +1,6 @@
 package no.kristiania.dto
 
-class CardsDto(
+class CardDto(
         var cardId : String? = null,
         var name : String? = null,
         var description : String? = null,
