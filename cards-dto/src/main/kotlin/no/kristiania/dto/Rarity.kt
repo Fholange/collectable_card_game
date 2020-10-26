@@ -9,4 +9,5 @@ enum class Rarity {
     GOLD,
 
     PINK_DIAMOND
+
 }

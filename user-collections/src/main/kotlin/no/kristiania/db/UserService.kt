@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import javax.persistence.LockModeType
@@ -15,16 +17,18 @@ interface UserRepository : CrudRepository<User, String>{
 fun lockedFind(@Param("id") userId: String) :User?
 }
 
+@Service
+@Transactional
 class UserService(
     private val userRepository: UserRepository,
     private val cardService: CardService
 ) {
 companion object{
 
-    const val CARDS_PER_DECK = 5
+    const val CARDS_PER_PACK = 5
 }
 
-fun findUserByIdEeager(userId: String) : User?{
+fun findByIdEager(userId: String) : User?{
     val user = userRepository.findById(userId).orElse(null)
     if(user != null){
         user.ownedCards.size
@@ -113,13 +117,25 @@ fun findUserByIdEeager(userId: String) : User?{
         user.coins += millValue
     }
 
-    fun openPack(userId: String, cardId: String){
-        validate(userId, cardId)
+    fun openPack(userId: String) : List<String>{
+        validateUser(userId)
         val user = userRepository.lockedFind(userId)!!
 
         if(user.cardPacks < 1){
-            throw IllegalArgumentException("no packs to open")
+            throw IllegalArgumentException("No pack to open")
         }
-            user.cardPacks--
+
+        user.cardPacks--
+
+        val selection = cardService.getRandomSelection(CARDS_PER_PACK)
+
+        val ids = mutableListOf<String>()
+
+        selection.forEach {
+            addCard(user, it.cardId)
+            ids.add(it.cardId)
+        }
+
+        return ids
     }
 }

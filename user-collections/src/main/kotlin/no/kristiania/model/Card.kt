@@ -5,7 +5,7 @@ import no.kristiania.dto.Rarity
 
 
 data class Card(
-        val cardId : String?,
+        val cardId : String,
         val rarity: Rarity
 
 ) {

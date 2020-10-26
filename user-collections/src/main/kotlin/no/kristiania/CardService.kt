@@ -64,8 +64,9 @@ class CardService {
     }
 
     fun getRandomSelection(n: Int) : List<Card>{
-        if(n < 0){
-            throw IllegalArgumentException("N must be a positive number: $n")
+
+        if(n <= 0){
+            throw IllegalArgumentException("Non-positive n: $n")
         }
 
         verifyCollection()
@@ -76,22 +77,21 @@ class CardService {
         val bronze = probabilities[Rarity.BRONZE]!!
         val silver = probabilities[Rarity.SILVER]!!
         val gold = probabilities[Rarity.GOLD]!!
-
+        //val pink = probabilities[Rarity.PINK_DIAMOND]!!
 
         repeat(n) {
             val p = Math.random()
-            val r = when {
+            val r = when{
                 p <= bronze -> Rarity.BRONZE
                 p > bronze && p <= bronze + silver -> Rarity.SILVER
                 p > bronze + silver && p <= bronze + silver + gold -> Rarity.GOLD
                 p > bronze + silver + gold -> Rarity.PINK_DIAMOND
                 else -> throw IllegalStateException("BUG for p=$p")
-
-
             }
-            val card = collection!!.cardsByRarity[r].let { it!![Random.nextInt(it.size)] }
+            val card = collection!!.cardsByRarity[r].let{ it!![Random.nextInt(it.size)] }
             selection.add(card)
         }
+
         return selection
     }
 
