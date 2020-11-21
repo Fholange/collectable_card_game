@@ -12,6 +12,8 @@
     <modules>
         <module>cards-dto</module>
         <module>user-collections</module>
+        <module>wrapped-responses</module>
+        <module>scores</module>
     </modules>
 
     <properties>
@@ -30,6 +32,7 @@
         <version.postgres>42.1.4</version.postgres>
         <version.restassured>4.2.0</version.restassured>
     </properties>
+
 
     <dependencies>
         <!--
@@ -135,6 +138,22 @@
                 <version>${version.restassured}</version>
                 <scope>test</scope>
             </dependency>
+
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>xml-path</artifactId>
+                <version>${version.restassured}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${version.restassured}</version>
+                <scope>test</scope>
+            </dependency>
+
+
             <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
@@ -167,8 +186,19 @@
                 <artifactId>jaxb-runtime</artifactId>
                 <version>${version.jaxb}</version>
             </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>28.1-jre</version>
+            </dependency>
 
+            <dependency>
+                <groupId>no.kristiania</groupId>
+                <artifactId>wrapped-responses</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
         </dependencies>
+
     </dependencyManagement>
 
     <build>

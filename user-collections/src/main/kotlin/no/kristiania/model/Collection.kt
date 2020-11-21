@@ -19,8 +19,8 @@ data class Collection(
             dto.prices.toMap(),
             dto.millValues.toMap(),
             dto.rarityProbabilities.toMap()
+    )
 
-            )
     val cardsByRarity : Map<Rarity, List<Card>> = cards.groupBy { it.rarity }
 
     init{
