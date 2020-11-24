@@ -1,4 +1,4 @@
-package org.tsdes.advanced.rest.exception
+package no.kristiania.rest.exception
 
 
 class UserInputValidationException(

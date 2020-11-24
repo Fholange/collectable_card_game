@@ -14,6 +14,7 @@
         <module>user-collections</module>
         <module>wrapped-responses</module>
         <module>scores</module>
+        <module>cards</module>
     </modules>
 
     <properties>

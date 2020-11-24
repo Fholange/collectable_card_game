@@ -7,6 +7,8 @@ import no.kristiania.dto.Command
 import no.kristiania.dto.PatchResultDto
 import no.kristiania.dto.PatchUserDto
 import no.kristiania.dto.UserDto
+import no.kristiania.rest.dto.RestResponseFactory
+import no.kristiania.rest.dto.WrappedResponse
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -25,13 +27,13 @@ class RestApi(private val userService: UserService) {
     @GetMapping(path = ["/{userId}"])
     fun getUserInfo(
             @PathVariable("userId") userId: String
-    ): ResponseEntity<UserDto> {
+    ): ResponseEntity<WrappedResponse<UserDto>> {
         val user = userService.findByIdEager(userId)
         if (user == null) {
-            return ResponseEntity.notFound().build()
+            return RestResponseFactory.notFound("User $userId not found")
         }
 
-        return ResponseEntity.status(200).body(DtoConverter.transform(user))
+        return RestResponseFactory.payload(200, DtoConverter.transform(user))
 
     }
 
@@ -39,10 +41,10 @@ class RestApi(private val userService: UserService) {
     @PutMapping(path = ["/{userId}"])
     fun createUser(
             @PathVariable("userId") userId: String
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<WrappedResponse<Void>> {
         val ok = userService.registerNewUser(userId)
-        return if (!ok) ResponseEntity.status(400).build()
-        else ResponseEntity.status(201).build()
+        return if (!ok) RestResponseFactory.userFailure("User id $userId already exist()")
+        else RestResponseFactory.noPayload(201)
     }
 
 
@@ -54,10 +56,11 @@ class RestApi(private val userService: UserService) {
     fun patchUser(
             @PathVariable("userId") userId: String,
             @RequestBody dto: PatchUserDto
-    ): ResponseEntity<PatchResultDto> {
+    ): ResponseEntity<WrappedResponse<PatchResultDto>> {
         if (dto.command == null) {
-            return ResponseEntity.status(400).build()
+            return RestResponseFactory.userFailure("Missing command")
         }
+
         if (dto.command == Command.OPEN_PACK) {
             val ids = try {
                 userService.openPack(userId)
@@ -65,32 +68,32 @@ class RestApi(private val userService: UserService) {
                 return ResponseEntity.status(400).build()
             }
 
-            return ResponseEntity.status(200).body(PatchResultDto().apply { cardIdsInOpenedPack })
+            return RestResponseFactory.payload(200, PatchResultDto().apply { cardIdsInOpenedPack.addAll(ids) })
         }
         //saving card from patchUserDto if null return status 400
         val cardId = dto.cardId
-                ?: return ResponseEntity.status(400).build()
+                ?: return RestResponseFactory.userFailure("Missing card id")
 
         if (dto.command == Command.BUY_CARD) {
 
             try {
                 userService.buyCard(userId, cardId)
             } catch (e: IllegalArgumentException) {
-                return ResponseEntity.status(400).build()
+                return RestResponseFactory.userFailure(e.message ?: "Failed to buy card $cardId")
             }
-            return ResponseEntity.status(200).body(PatchResultDto())
+            return RestResponseFactory.payload(200, PatchResultDto())
         }
 
         if (dto.command == Command.MILL_CARD) {
             try {
                 userService.millCard(userId, cardId)
             } catch (e: IllegalArgumentException) {
-                return ResponseEntity.status(400).build()
+                return RestResponseFactory.userFailure(e.message ?: "Failed to mill card $cardId")
             }
-            return ResponseEntity.status(200).body(PatchResultDto())
+            return RestResponseFactory.payload(200, PatchResultDto())
         }
 
-        return ResponseEntity.status(400).build()
+        return RestResponseFactory.userFailure("Unrecognized command: ${dto.command}")
     }
 
 

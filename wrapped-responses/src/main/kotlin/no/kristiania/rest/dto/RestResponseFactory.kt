@@ -1,4 +1,4 @@
-package org.tsdes.advanced.rest.dto
+package no.kristiania.rest.dto
 
 import org.springframework.http.ResponseEntity
 import java.net.URI
