@@ -15,6 +15,8 @@
         <module>wrapped-responses</module>
         <module>scores</module>
         <module>cards</module>
+        <module>api-gateway</module>
+        <module>e2e-Test</module>
     </modules>
 
     <properties>
@@ -32,6 +34,8 @@
         <version.h2>1.4.197</version.h2>
         <version.postgres>42.1.4</version.postgres>
         <version.restassured>4.2.0</version.restassured>
+        <version.testcontainers>1.12.4</version.testcontainers>
+        <version.awaitility>4.0.3</version.awaitility>
     </properties>
 
 
@@ -158,7 +162,7 @@
             <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
-                <version>${awaitility.version}</version>
+                <version>${version.awaitility}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -166,13 +170,13 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers</artifactId>
-                <version>${testcontainers.version}</version>
+                <version>${version.testcontainers}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>junit-jupiter</artifactId>
-                <version>${testcontainers.version}</version>
+                <version>${version.testcontainers}</version>
                 <scope>test</scope>
             </dependency>
 

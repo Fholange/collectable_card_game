@@ -21,15 +21,17 @@ import kotlin.random.Random
 
 @Service
 class CardService (
+        private val client: RestTemplate,
         private val circuitBreakerFactory: Resilience4JCircuitBreakerFactory
 ){
     companion object{
         private val log = LoggerFactory.getLogger(CardService::class.java)
     }
 
+    protected var collection: Collection? = null
+
     @Value("\${cardServiceAddress}")
     private lateinit var cardServiceAddress: String
-    protected var collection: Collection? = null
 
     val cardCollection : List<Card>
         get() = collection?.cards ?: listOf()
@@ -38,7 +40,7 @@ class CardService (
 
     private lateinit var cb: CircuitBreaker
 
-    private val client = RestTemplate()
+
 
     @PostConstruct
     fun init(){
@@ -144,7 +146,5 @@ class CardService (
 
         return selection
     }
-
-
 
 }
