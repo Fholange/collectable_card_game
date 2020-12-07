@@ -14,9 +14,15 @@
     <build>
         <plugins>
             <plugin>
+                <!-- Used to compile Kotlin -->
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
+
         </plugins>
     </build>
 

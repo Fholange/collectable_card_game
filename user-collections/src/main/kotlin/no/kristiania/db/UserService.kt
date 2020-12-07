@@ -5,16 +5,20 @@ import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import javax.persistence.LockModeType
 
+@Repository
 interface UserRepository : CrudRepository<User, String>{
-@Lock(LockModeType.PESSIMISTIC_WRITE)
-@Query("select u from User u where u.userId = :id")
-fun lockedFind(@Param("id") userId: String) :User?
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select u from User u where u.userId = :id")
+    fun lockedFind(@Param("id") userId: String) :User?
+
 }
 
 @Service

@@ -1,9 +1,9 @@
 package no.kristiania.db
 
-import org.junit.jupiter.api.Assertions.*
 import no.kristiania.CardService
 import no.kristiania.FakeData
 import no.kristiania.model.Collection
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -15,12 +15,12 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import java.lang.IllegalArgumentException
+import org.springframework.web.client.RestTemplate
 
 @Profile("UserServiceTest")
 @Primary
 @Service
-class FakeCardService : CardService(Resilience4JCircuitBreakerFactory()){
+class FakeCardService : CardService(RestTemplate(), Resilience4JCircuitBreakerFactory()){
 
     override fun fetchData() {
         val dto = FakeData.getCollectionDto()
@@ -28,10 +28,13 @@ class FakeCardService : CardService(Resilience4JCircuitBreakerFactory()){
     }
 }
 
+
+
 @ActiveProfiles("UserServiceTest,test")
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-internal class UserServiceTest {
+internal class UserServiceTest{
+
     @Autowired
     private lateinit var userService: UserService
 
@@ -42,6 +45,7 @@ internal class UserServiceTest {
     fun initTest(){
         userRepository.deleteAll()
     }
+
 
     @Test
     fun testCreateUser(){
@@ -59,34 +63,37 @@ internal class UserServiceTest {
 
     @Test
     fun testBuyCard(){
+
         val userId = "foo"
-        val carId = "c00"
+        val cardId = "c00"
 
         userService.registerNewUser(userId)
-        userService.buyCard(userId, carId)
+        userService.buyCard(userId, cardId)
+
         val user = userService.findByIdEager(userId)!!
-
-        assertTrue(user.ownedCards.any{it.cardId == carId})
-
+        assertTrue(user.ownedCards.any { it.cardId == cardId})
     }
 
     @Test
-    fun testBuyCardNoMoney(){
+    fun testBuyCardFailNotEnoughMoney(){
+
         val userId = "foo"
         val cardId = "c09"
+        userService.registerNewUser(userId)
 
-        userService.registerNewUser(userId);
-       val e = assertThrows(IllegalArgumentException::class.java) {
-           userService.buyCard(userId, cardId)
-
-       }
+        val e = assertThrows(IllegalArgumentException::class.java){
+            userService.buyCard(userId, cardId)
+        }
         assertTrue(e.message!!.contains("coin"), "Wrong error message: ${e.message}")
-       }
+    }
+
 
     @Test
     fun testOpenPack(){
+
         val userId = "foo"
         userService.registerNewUser(userId)
+
         val before = userService.findByIdEager(userId)!!
         val totCards = before.ownedCards.sumBy { it.numberOfCopies }
         val totPacks = before.cardPacks
@@ -96,8 +103,9 @@ internal class UserServiceTest {
         assertEquals(UserService.CARDS_PER_PACK, n)
 
         val after = userService.findByIdEager(userId)!!
-        assertEquals(totPacks-1, after.cardPacks)
-        assertEquals(totCards + UserService.CARDS_PER_PACK, after.ownedCards.sumBy { it.numberOfCopies })
+        assertEquals(totPacks - 1, after.cardPacks)
+        assertEquals(totCards + UserService.CARDS_PER_PACK,
+                after.ownedCards.sumBy { it.numberOfCopies }  )
     }
 
     @Test

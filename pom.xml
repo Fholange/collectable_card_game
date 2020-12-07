@@ -40,10 +40,7 @@
 
 
     <dependencies>
-        <!--
-            These dependencies are used by (almost) every module.
-            Imported in the root for convenience.
-        -->
+
         <!-- Kotlin dependencies -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -216,15 +213,7 @@
 
     <build>
         <plugins>
-            <!--
-                These plugins are used by (almost) every module.
-                Imported in the root for convenience.
-            -->
-            <plugin>
-                <!-- Used to compile Kotlin -->
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-            </plugin>
+
             <plugin>
                 <!-- Used to run integration tests -->
                 <groupId>org.apache.maven.plugins</groupId>
@@ -296,10 +285,38 @@
                         </execution>
                     </executions>
                 </plugin>
-
-                <!-- Maven Failsafe Plugin -->
                 <plugin>
-                    <!-- Used for integration tests -->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <executions>
+                        <!-- Replacing default-compile as it is treated specially by maven -->
+                        <execution>
+                            <id>default-compile</id>
+                            <phase>none</phase>
+                        </execution>
+                        <!-- Replacing default-testCompile as it is treated specially by maven -->
+                        <execution>
+                            <id>default-testCompile</id>
+                            <phase>none</phase>
+                        </execution>
+                        <execution>
+                            <id>java-compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>java-test-compile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- this is needed to run integration tests -->
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${version.surefire-failsafe}</version>
@@ -336,10 +353,10 @@
 
                 <!-- Exec Maven Plugin -->
                 <plugin>
-                    <!--  To execute external commands, like YARN -->
+                    <!-- For manual handling of generated resources -->
                     <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>1.6.0</version>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.0.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>

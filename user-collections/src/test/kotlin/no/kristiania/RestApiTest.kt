@@ -1,5 +1,11 @@
 package no.kristiania
 
+import no.kristiania.db.UserRepository
+import no.kristiania.db.UserService
+import no.kristiania.dto.Command
+import no.kristiania.dto.PatchUserDto
+import no.kristiania.rest.dto.WrappedResponse
+
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.common.ConsoleNotifier
@@ -7,12 +13,6 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
-import no.kristiania.db.UserRepository
-import no.kristiania.db.UserService
-import no.kristiania.dto.Command
-import no.kristiania.dto.PatchUserDto
-import no.kristiania.model.Collection
-import no.kristiania.rest.dto.WrappedResponse
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,12 +21,10 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.context.annotation.Primary
-import org.springframework.context.annotation.Profile
-import org.springframework.stereotype.Service
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+
 import wiremock.com.fasterxml.jackson.databind.ObjectMapper
 import javax.annotation.PostConstruct
 

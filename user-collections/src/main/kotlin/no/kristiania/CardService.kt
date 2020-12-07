@@ -20,10 +20,11 @@ import javax.annotation.PostConstruct
 import kotlin.random.Random
 
 @Service
-class CardService (
+class CardService(
         private val client: RestTemplate,
         private val circuitBreakerFactory: Resilience4JCircuitBreakerFactory
-){
+) {
+
     companion object{
         private val log = LoggerFactory.getLogger(CardService::class.java)
     }
@@ -39,7 +40,6 @@ class CardService (
     private val lock = Any()
 
     private lateinit var cb: CircuitBreaker
-
 
 
     @PostConstruct
@@ -58,6 +58,7 @@ class CardService (
     fun isInitialized() = cardCollection.isNotEmpty()
 
     protected fun fetchData(){
+
         val version = "v1_000"
         val uri = UriComponentsBuilder
                 .fromUriString("http://${cardServiceAddress.trim()}/api/cards/collection_$version")
@@ -77,6 +78,7 @@ class CardService (
                 }
         ) ?: return
 
+
         if (response.statusCodeValue != 200) {
             log.error("Error in fetching data from Card Service. Status ${response.statusCodeValue}." +
                     "Message: " + response.body.message)
@@ -90,29 +92,30 @@ class CardService (
     }
 
     private fun verifyCollection(){
+
         if(collection == null){
             fetchData()
+
             if(collection == null){
-                throw IllegalStateException("not collection info")
+                throw IllegalStateException("No collection info")
             }
         }
-    }
-    fun price (cardId: String) : Int {
-        verifyCollection()
-
-        val card : Card = cardCollection.find {it.cardId == cardId}
-                ?: throw IllegalArgumentException("Invalid Card")
-
-        return collection!!.prices[card.rarity]!!
     }
 
     fun millValue(cardId: String) : Int {
         verifyCollection()
-
-        val card : Card = cardCollection.find {it.cardId == cardId}
-                ?: throw IllegalArgumentException("Invalid Card")
+        val card : Card = cardCollection.find { it.cardId  == cardId} ?:
+        throw IllegalArgumentException("Invalid cardId $cardId")
 
         return collection!!.millValues[card.rarity]!!
+    }
+
+    fun price(cardId: String) : Int {
+        verifyCollection()
+        val card : Card = cardCollection.find { it.cardId  == cardId} ?:
+        throw IllegalArgumentException("Invalid cardId $cardId")
+
+        return collection!!.prices[card.rarity]!!
     }
 
     fun getRandomSelection(n: Int) : List<Card>{
@@ -146,5 +149,4 @@ class CardService (
 
         return selection
     }
-
 }
